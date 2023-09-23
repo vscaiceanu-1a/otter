@@ -11,7 +11,7 @@ This package is an [Otter Framework Module](https://github.com/AmadeusITGroup/ot
 
 This module aims at improving the communication with third parties.
 It exposes bridges to integrate third parties iFrame via an established communication protocol.
-It also provides support of an A/B Testing solution via shared windows properties 
+It also provides support of an A/B Testing solution via shared windows properties
 (more info on the [A/B testing dedicated documentation](https://github.com/AmadeusITGroup/otter/tree/main/docs/ab-testing/AB_TESTING.md))
 
 ## How to install
@@ -29,4 +29,4 @@ Otter framework provides a set of code generators based on [angular schematics](
 | Schematics            | Description                                                  | How to use                  |
 | --------------------- | ------------------------------------------------------------ | --------------------------- |
 | add                   | Include Otter third party module in a library / application. | `ng add @o3r/third-party`   |
-| iframe-to-component  | Add iframe to an Otter component                             | `ng g iframe-to-component` |
+| iframe-to-component   | Add iframe to an Otter component                             | `ng g iframe-to-component`  |

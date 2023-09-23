@@ -48,6 +48,7 @@
   "angularCompilerOptions": {
     "skipTemplateCodegen": true,
     "skipMetadataEmit": false,
+    "strictTemplates": true,
     "strictMetadataEmit": true,
     "strictInjectionParameters": true,
     "fullTemplateTypeCheck": true,

@@ -12,7 +12,6 @@ export const selectPlaceholderTemplateEntities = createSelector(selectPlaceholde
 
 /**
  * Select a specific PlaceholderTemplate
- *
  * @param placeholderId
  */
 export const selectPlaceholderTemplateEntity = (placeholderId: string) =>
@@ -22,7 +21,6 @@ export const selectPlaceholderTemplateEntity = (placeholderId: string) =>
  * Select the ordered rendered templates for a given placeholderId
  * Return undefined if the placeholder is not found
  * Returns {orderedRenderedTemplates: undefined, isPending: true} if any of the request is still pending
- *
  * @param placeholderId
  */
 export const selectPlaceholderRenderedTemplates = (placeholderId: string) => createSelector(
@@ -34,7 +32,7 @@ export const selectPlaceholderRenderedTemplates = (placeholderId: string) => cre
     }
     // The isPending will be considered true if any of the Url is still pending
     let isPending: boolean | undefined = false;
-    const templates: { rawUrl: string; priority: number; renderedTemplate?: string }[] = [];
+    const templates: { rawUrl: string; priority: number; renderedTemplate?: string; isolated: boolean }[] = [];
     placeholderTemplate.urlsWithPriority.forEach(urlWithPriority => {
       const placeholderRequest = placeholderRequestState.entities[urlWithPriority.rawUrl];
       if (placeholderRequest) {
@@ -45,7 +43,8 @@ export const selectPlaceholderRenderedTemplates = (placeholderId: string) => cre
           templates.push({
             rawUrl: urlWithPriority.rawUrl,
             priority: urlWithPriority.priority,
-            renderedTemplate: placeholderRequest.renderedTemplate
+            renderedTemplate: placeholderRequest.renderedTemplate,
+            isolated: !!placeholderRequest.isolated
           });
         }
       }
@@ -60,5 +59,5 @@ export const selectPlaceholderRenderedTemplates = (placeholderId: string) => cre
     }).map(template => template.renderedTemplate)
       .filter(renderedTemplate => !!renderedTemplate);
 
-    return {orderedRenderedTemplates, isPending};
+    return { orderedRenderedTemplates, isPending, isolated: templates.some(({isolated}) => isolated) };
   });

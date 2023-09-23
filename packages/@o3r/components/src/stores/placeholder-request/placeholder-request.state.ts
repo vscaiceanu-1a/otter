@@ -15,6 +15,7 @@ export interface PlaceholderVariable {
  * Raw JSON template coming back from the CMS or any other source
  */
 export interface PlaceholderRequestReply {
+  isolated?: boolean;
   template?: string;
   vars?: Record<string, PlaceholderVariable>;
 }
