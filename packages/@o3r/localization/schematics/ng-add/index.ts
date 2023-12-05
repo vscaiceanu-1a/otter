@@ -13,7 +13,7 @@ import { registerDevtools } from './helpers/devtools-registration';
 export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     try {
-      const { applyEsLintFix, install, getProjectNewDependenciesType, getWorkspaceConfig, ngAddPackages, ngAddPeerDependencyPackages, getO3rPeerDeps} = await import('@o3r/schematics');
+      const { applyEsLintFix, addDependenciesInPackageJson, install, getProjectNewDependenciesType, getWorkspaceConfig, ngAddPackages, ngAddPeerDependencyPackages, getO3rPeerDeps} = await import('@o3r/schematics');
       const {updateI18n, updateLocalization} = await import('../localization-base');
       const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
@@ -27,6 +27,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
       const dependencyType = getProjectNewDependenciesType(workspaceProject);
       const registerDevtoolRule = await registerDevtools(options);
       return () => chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         updateLocalization(options, __dirname),
         updateI18n(options),
         options.skipLinter ? noop() : applyEsLintFix(),

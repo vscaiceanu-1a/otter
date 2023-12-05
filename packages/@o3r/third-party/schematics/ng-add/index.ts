@@ -1,17 +1,24 @@
+import { chain } from '@angular-devkit/schematics';
 import type { Rule } from '@angular-devkit/schematics';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { NgAddSchematicsSchema } from './schema';
 
 /**
  * Add Otter third-party to an Angular Project
  */
-export function ngAdd(): Rule {
-  return async (_, context) => {
+export function ngAdd(options: NgAddSchematicsSchema): Rule {
+  return async (tree, context) => {
     try {
       const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
-      const {registerPackageCollectionSchematics} = await import('@o3r/schematics');
-      return registerPackageCollectionSchematics(packageJson);
+      const {addDependenciesInPackageJson, getWorkspaceConfig, registerPackageCollectionSchematics} = await import('@o3r/schematics');
+      const workspaceProject = options.projectName ? getWorkspaceConfig(tree)?.projects[options.projectName] : undefined;
+      const workingDirectory = workspaceProject?.root;
+      return chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
+        registerPackageCollectionSchematics(packageJson)
+      ]);
     } catch (e) {
       // third-party needs o3r/core as peer dep. o3r/core will install o3r/schematics
       context.logger.error(`[ERROR]: Adding @o3r/third-party has failed.

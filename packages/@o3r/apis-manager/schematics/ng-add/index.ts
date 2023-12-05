@@ -1,5 +1,6 @@
 import { chain, noop, Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { NgAddSchematicsSchema } from './schema';
 
@@ -10,9 +11,11 @@ import { NgAddSchematicsSchema } from './schema';
 export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     try {
-      const { ngAddPackages, getO3rPeerDeps, applyEsLintFix, getWorkspaceConfig, getProjectNewDependenciesType } = await import('@o3r/schematics');
+      const { addDependenciesInPackageJson, ngAddPackages, getO3rPeerDeps, applyEsLintFix, getWorkspaceConfig, getProjectNewDependenciesType } = await import('@o3r/schematics');
       const { updateApiDependencies } = await import('../helpers/update-api-deps');
-      const depsInfo = getO3rPeerDeps(path.resolve(__dirname, '..', '..', 'package.json'));
+      const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
+      const depsInfo = getO3rPeerDeps(packageJsonPath);
       const rulesToExecute: Rule[] = [];
       const workspaceProject = options.projectName ? getWorkspaceConfig(tree)?.projects[options.projectName] : undefined;
       const workingDirectory = workspaceProject?.root;
@@ -22,6 +25,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
       }
 
       return () => chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         ...rulesToExecute,
         options.skipLinter ? noop : applyEsLintFix(),
         ngAddPackages(depsInfo.o3rPeerDeps, {

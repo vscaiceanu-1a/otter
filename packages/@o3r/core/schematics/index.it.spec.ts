@@ -1,7 +1,7 @@
 import {
   addImportToAppModule,
   getDefaultExecSyncOptions,
-  packageManagerAdd,
+  getGitDiff,
   packageManagerExec,
   packageManagerInstall,
   packageManagerRun,
@@ -12,6 +12,7 @@ import {
 } from '@o3r/test-helpers';
 import { join } from 'node:path';
 import { execSync, spawn } from 'node:child_process';
+import { rm } from 'node:fs/promises';
 import getPidFromPort from 'pid-from-port';
 
 const devServerPort = 4200;
@@ -81,11 +82,23 @@ describe('new otter application', () => {
       packageManagerExec('ng g @schematics/angular:component test-ng-component', execAppOptions);
       packageManagerExec('ng g @o3r/core:convert-component --path="src/app/test-ng-component/test-ng-component.component.ts"', execAppOptions);
 
+      packageManagerExec('ng g @o3r/testing:playwright-scenario --name=test-scenario', execAppOptions);
+      packageManagerExec('ng g @o3r/testing:playwright-sanity --name=test-sanity', execAppOptions);
+
+      const diff = getGitDiff(execAppOptions.cwd as string);
+
+      // Expect created files inside `test-app` project
+      expect(diff.added.filter((file) => /e2e-playwright/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /src[\\/]app/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /src[\\/]components/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /src[\\/]environments/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /src[\\/]services/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /src[\\/]store/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /src[\\/]styling/.test(file)).length).toBeGreaterThan(0);
+
       expect(() => packageManagerRun('build', execAppOptions)).not.toThrow();
 
       // should pass the e2e tests
-      packageManagerExec('ng g @o3r/testing:playwright-scenario --name=test-scenario', execAppOptions);
-      packageManagerExec('ng g @o3r/testing:playwright-sanity --name=test-sanity', execAppOptions);
       spawn(`npx http-server -p ${devServerPort} ./dist`, [], {
         ...execAppOptions,
         shell: true,
@@ -102,8 +115,14 @@ describe('new otter application', () => {
       try {
         const pid = await getPidFromPort(devServerPort);
         execSync(process.platform === 'win32' ? `taskkill /f /t /pid ${pid}` : `kill -15 ${pid}`, {stdio: 'inherit'});
+        await new Promise((resolve) => setTimeout(resolve, 3500));
       } catch (e) {
         // http-server already off
+      }
+      try {
+        await rm(execAppOptions.cwd, {recursive: true});
+      } catch (e) {
+        // unable to clean the folder
       }
     });
   });
@@ -115,10 +134,6 @@ describe('new otter application', () => {
       execAppOptions.cwd = workspacePath;
     });
     test('should build empty app', () => {
-      // FIXME workaround for pnp
-      packageManagerAdd(`@o3r/core@${o3rVersion} @o3r/analytics@${o3rVersion}`, execAppOptions);
-      packageManagerAdd(`@o3r/core@${o3rVersion} @o3r/analytics@${o3rVersion}`, { ...execAppOptions, cwd: appFolderPath });
-
       packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion}`, execAppOptions);
 
       const projectName = '--project-name=test-app';
@@ -210,11 +225,29 @@ describe('new otter application', () => {
         execAppOptions
       );
 
+      packageManagerExec(`ng g @o3r/testing:playwright-scenario --name=test-scenario ${projectName}`, execAppOptions);
+      packageManagerExec(`ng g @o3r/testing:playwright-sanity --name=test-sanity ${projectName}`, execAppOptions);
+
+      const diff = getGitDiff(execAppOptions.cwd as string);
+
+      // Expect no file modified inside 'dont-modify-me' project
+      expect(diff.all.filter((file) => /projects[\\/]dont-modify-me/.test(file)).length).toBe(0);
+
+      // Expect no file created outside 'test-app' project
+      expect(diff.added.filter((file) => !/projects[\\/]test-app/.test(file)).length).toBe(0);
+
+      // Expect created files inside `test-app` project
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]e2e-playwright/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]src[\\/]app/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]src[\\/]components/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]src[\\/]environments/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]src[\\/]services/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]src[\\/]store/.test(file)).length).toBeGreaterThan(0);
+      expect(diff.added.filter((file) => /projects[\\/]test-app[\\/]src[\\/]styling/.test(file)).length).toBeGreaterThan(0);
+
       expect(() => packageManagerRun('build', execAppOptions)).not.toThrow();
 
       // should pass the e2e tests
-      packageManagerExec(`ng g @o3r/testing:playwright-scenario --name=test-scenario ${projectName}`, execAppOptions);
-      packageManagerExec(`ng g @o3r/testing:playwright-sanity --name=test-sanity ${projectName}`, execAppOptions);
       spawn(`npx http-server -p ${devServerPort} ./projects/test-app/dist`, [], {
         ...execAppOptions,
         shell: true,
@@ -231,8 +264,14 @@ describe('new otter application', () => {
       try {
         const pid = await getPidFromPort(devServerPort);
         execSync(process.platform === 'win32' ? `taskkill /f /t /pid ${pid}` : `kill -15 ${pid}`, { stdio: 'inherit' });
+        await new Promise((resolve) => setTimeout(resolve, 3500));
       } catch (e) {
         // http-server already off
+      }
+      try {
+        await rm(execAppOptions.cwd, {recursive: true});
+      } catch (e) {
+        // unable to clean the folder
       }
     });
   });

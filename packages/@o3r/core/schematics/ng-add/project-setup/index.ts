@@ -10,6 +10,7 @@ import {
   updateStore
 } from '../../rule-factories/index';
 import {
+  addDependenciesInPackageJson,
   applyEsLintFix,
   getO3rPeerDeps,
   getWorkspaceConfig,
@@ -42,6 +43,7 @@ export const prepareProject = (options: NgAddSchematicsSchema) => async (tree: T
   const installOtterLinter = await shouldOtterLinterBeInstalled(context);
   const workspaceConfig = getWorkspaceConfig(tree);
   const workspaceProject = options.projectName && workspaceConfig?.projects?.[options.projectName] || undefined;
+  const workingDirectory = workspaceProject?.root;
   const projectType = workspaceProject?.projectType;
   const depsInfo = getO3rPeerDeps(corePackageJsonPath);
   const internalPackagesToInstallWithNgAdd = Array.from(new Set([
@@ -64,6 +66,7 @@ export const prepareProject = (options: NgAddSchematicsSchema) => async (tree: T
   return () => {
 
     const appLibRules: Rule[] = [
+      addDependenciesInPackageJson([corePackageJsonContent.name!], {...options, workingDirectory, version: corePackageJsonContent.version}),
       updateImports(mapImportV7toV8, renamedPackagesV7toV8) as any,
       updateBuildersNames(),
       updateOtterGeneratorsNames(),

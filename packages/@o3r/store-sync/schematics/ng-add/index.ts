@@ -1,6 +1,7 @@
 import { chain, noop, Rule } from '@angular-devkit/schematics';
-import type { NgAddSchematicsSchema } from './schema';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { NgAddSchematicsSchema } from './schema';
 
 /**
  * Add Otter store-sync to an Otter Project
@@ -10,11 +11,14 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree, context) => {
     try {
       // use dynamic import to properly raise an exception if it is not an Otter project.
-      const { applyEsLintFix, install, ngAddPackages, getO3rPeerDeps, getWorkspaceConfig } = await import('@o3r/schematics');
+      const { applyEsLintFix, addDependenciesInPackageJson, install, ngAddPackages, getO3rPeerDeps, getWorkspaceConfig } = await import('@o3r/schematics');
+      const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
       // retrieve dependencies following the /^@o3r\/.*/ pattern within the peerDependencies of the current module
-      const depsInfo = getO3rPeerDeps(path.resolve(__dirname, '..', '..', 'package.json'));
+      const depsInfo = getO3rPeerDeps(packageJsonPath);
       const workingDirectory = options?.projectName && getWorkspaceConfig(tree)?.projects[options.projectName]?.root || '.';
       return chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         // optional custom action dedicated to this module
         options.skipLinter ? noop() : applyEsLintFix(),
         // install packages needed in the current module

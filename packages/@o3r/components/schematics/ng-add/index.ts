@@ -14,6 +14,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     try {
       const {
+        addDependenciesInPackageJson,
         getDefaultOptionsForSchematic,
         getO3rPeerDeps,
         getProjectNewDependenciesType,
@@ -37,6 +38,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
       const workingDirectory = workspaceProject?.root || '.';
       const dependencyType = getProjectNewDependenciesType(workspaceProject);
       const rule = chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         removePackages(['@otter/components']),
         ngAddPackages(depsInfo.o3rPeerDeps, {
           skipConfirmation: true,

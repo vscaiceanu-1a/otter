@@ -1,5 +1,6 @@
 import { apply, chain, MergeStrategy, mergeWith, move, noop, renameTemplateFiles, Rule, SchematicContext, template, Tree, url } from '@angular-devkit/schematics';
 import {
+  addDependenciesInPackageJson,
   addVsCodeRecommendations,
   getO3rPeerDeps,
   getProjectNewDependenciesType,
@@ -9,7 +10,9 @@ import {
   ngAddPeerDependencyPackages,
   O3rCliError,
   registerPackageCollectionSchematics,
-  removePackages, setupSchematicsDefaultParams } from '@o3r/schematics';
+  removePackages,
+  setupSchematicsDefaultParams
+} from '@o3r/schematics';
 import { askConfirmation } from '@angular/cli/src/utilities/prompt';
 import { NodeDependencyType } from '@schematics/angular/utility/dependencies';
 import * as fs from 'node:fs';
@@ -75,6 +78,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
       }
 
       const rules = [
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         updateFixtureConfig(options, installJest),
         removePackages(['@otter/testing']),
         addVsCodeRecommendations(['Orta.vscode-jest']),
@@ -139,7 +143,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
       }
 
 
-      return () => chain(rules)(tree, context);
+      return chain(rules)(tree, context);
 
     } catch (e) {
       context.logger.error(`[ERROR]: Adding @o3r/testing has failed.

@@ -1,4 +1,5 @@
 import { chain, noop, Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { NgAddSchematicsSchema } from './schema';
 
@@ -9,13 +10,16 @@ import { NgAddSchematicsSchema } from './schema';
 export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     try {
-      const { applyEsLintFix, install, ngAddPackages, getO3rPeerDeps, getProjectNewDependenciesType, getWorkspaceConfig, removePackages } = await import('@o3r/schematics');
+      const { applyEsLintFix, addDependenciesInPackageJson, install, ngAddPackages, getO3rPeerDeps, getProjectNewDependenciesType, getWorkspaceConfig, removePackages } = await import('@o3r/schematics');
       const { updateStorybook } = await import('../storybook-base');
-      const depsInfo = getO3rPeerDeps(path.resolve(__dirname, '..', '..', 'package.json'));
+      const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
+      const depsInfo = getO3rPeerDeps(packageJsonPath);
       const workspaceProject = options.projectName ? getWorkspaceConfig(tree)?.projects[options.projectName] : undefined;
       const workingDirectory = workspaceProject?.root || '.';
       const dependencyType = getProjectNewDependenciesType(workspaceProject);
       return () => chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         removePackages(['@otter/storybook']),
         updateStorybook(options, __dirname),
         options.skipLinter ? noop() : applyEsLintFix(),

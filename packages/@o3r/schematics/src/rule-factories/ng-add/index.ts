@@ -11,6 +11,45 @@ import type { NgAddPackageOptions } from '../../tasks/index';
 import { getExternalDependenciesVersionRange, getNodeDependencyList, getPackageManager, getWorkspaceConfig, registerCollectionSchematics, writeAngularJson } from '../../utility/index';
 
 /**
+ * Add dependencies to the package.json (both root and subproject in case of monorepo with options.workingDirectory)
+ * @param packages List of packages to be installed via `ng add`
+ * @param options install options
+ * @param packageJsonPath path of the package json of the project where they will be installed
+ */
+export function addDependenciesInPackageJson(
+  packages: string[], options?: Omit<NgAddPackageOptions, 'version'> & { version?: string | (string | undefined)[] }, packageJsonPath = '/package.json'): Rule {
+  return (tree, _context) => {
+    if (options?.workingDirectory && !packageJsonPath.replace(/[\\/]/g, '/').startsWith(options.workingDirectory.replace(/[\\/]/g, '/'))) {
+      packageJsonPath = path.join(options.workingDirectory, packageJsonPath);
+    }
+    const versions = Object.fromEntries(packages.map<[string, string | undefined]>((packageName, index) =>
+      [packageName, typeof options?.version === 'object' ? options.version[index] : options?.version]));
+    const sortDependencies = (packageJson: any, depType: 'dependencies' | 'devDependencies' | 'peerDependencies') => {
+      packageJson[depType] = packageJson[depType] ?
+        Object.fromEntries(Object.entries(packageJson[depType]).sort(([key1, _val1], [key2, _val2]) => key1.localeCompare(key2))) :
+        undefined;
+    };
+    for (const filePath of new Set([packageJsonPath, './package.json'])) {
+      const packageJson: PackageJson = tree.readJson(filePath) as PackageJson;
+      packages.forEach((packageName) => {
+        const version = versions[packageName] || 'latest';
+        if (options?.dependencyType === NodeDependencyType.Dev) {
+          packageJson.devDependencies = {...packageJson.devDependencies, [packageName]: version};
+        } else if (options?.dependencyType === NodeDependencyType.Peer) {
+          packageJson.peerDependencies = {...packageJson.peerDependencies, [packageName]: version};
+        } else {
+          packageJson.dependencies = {...packageJson.dependencies, [packageName]: version};
+        }
+      });
+      (['dependencies', 'devDependencies', 'peerDependencies'] as const).forEach((depType) => {
+        sortDependencies(packageJson, depType);
+      });
+      tree.overwrite(filePath, JSON.stringify(packageJson, null, 2));
+    }
+  };
+}
+
+/**
  * Install via `ng add` a list of npm packages.
  * @param packages List of packages to be installed via `ng add`
  * @param options install options
@@ -25,7 +64,7 @@ export function ngAddPackages(packages: string[], options?: Omit<NgAddPackageOpt
   const fsWorkingDirectory = (options?.workingDirectory && !cwd.endsWith(options.workingDirectory)) ? options.workingDirectory : '.';
   const versions = Object.fromEntries(packages.map<[string, string | undefined]>((packageName, index) =>
     [packageName, typeof options?.version === 'object' ? options.version[index] : options?.version]));
-  if (options?.workingDirectory && !packageJsonPath.startsWith(options.workingDirectory)) {
+  if (options?.workingDirectory && !packageJsonPath.replace(/[\\/]/g, '/').startsWith(options.workingDirectory.replace(/[\\/]/g, '/'))) {
     packageJsonPath = path.join(options.workingDirectory, packageJsonPath);
   }
 
@@ -82,30 +121,7 @@ export function ngAddPackages(packages: string[], options?: Omit<NgAddPackageOpt
   }
   return chain([
     // Update package.json in tree
-    (tree) => {
-      const sortDependencies = (packageJson: any, depType: 'dependencies' | 'devDependencies' | 'peerDependencies') => {
-        packageJson[depType] = packageJson[depType] ?
-          Object.fromEntries(Object.entries(packageJson[depType]).sort(([key1, _val1], [key2, _val2]) => key1.localeCompare(key2))) :
-          undefined;
-      };
-      for (const filePath of new Set([packageJsonPath, './package.json'])) {
-        const packageJson: PackageJson = tree.readJson(filePath) as PackageJson;
-        packages.forEach((packageName) => {
-          const version = versions[packageName] || 'latest';
-          if (options?.dependencyType === NodeDependencyType.Dev) {
-            packageJson.devDependencies = {...packageJson.devDependencies, [packageName]: version};
-          } else if (options?.dependencyType === NodeDependencyType.Peer) {
-            packageJson.peerDependencies = {...packageJson.peerDependencies, [packageName]: version};
-          } else {
-            packageJson.dependencies = {...packageJson.dependencies, [packageName]: version};
-          }
-        });
-        (['dependencies', 'devDependencies', 'peerDependencies'] as const).forEach((depType) => {
-          sortDependencies(packageJson, depType);
-        });
-        tree.overwrite(filePath, JSON.stringify(packageJson, null, 2));
-      }
-    },
+    addDependenciesInPackageJson(packages, options, packageJsonPath),
     // Run ng-adds
     async (tree, context) => {
       if (options?.skipNgAddSchematicRun) {

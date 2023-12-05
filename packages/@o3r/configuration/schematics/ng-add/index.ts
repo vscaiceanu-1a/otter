@@ -13,6 +13,7 @@ export function ngAdd(options: NgAddSchematicsSchema) {
   return async (tree: Tree, context: SchematicContext) => {
     try {
       const {
+        addDependenciesInPackageJson,
         ngAddPackages,
         getProjectNewDependenciesType,
         getWorkspaceConfig,
@@ -29,6 +30,7 @@ export function ngAdd(options: NgAddSchematicsSchema) {
       context.logger.info(`The package ${depsInfo.packageName as string} comes with a debug mechanism`);
       context.logger.info('Get more information on the following page: https://github.com/AmadeusITGroup/otter/tree/main/docs/configuration/OVERVIEW.md#Runtime-debugging');
       return chain([
+        addDependenciesInPackageJson(['@o3r/configuration'], {...options, workingDirectory, version: packageJson.version}),
         registerPackageCollectionSchematics(packageJson),
         setupSchematicsDefaultParams({
           // eslint-disable-next-line @typescript-eslint/naming-convention

@@ -12,8 +12,10 @@ import type { NgAddSchematicsSchema } from './schema';
 export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
     try {
       const {
+        addDependenciesInPackageJson,
         getDefaultOptionsForSchematic,
         getO3rPeerDeps,
         getProjectNewDependenciesType,
@@ -37,6 +39,7 @@ export function ngAdd(options: NgAddSchematicsSchema): Rule {
       const workingDirectory = workspaceProject?.root || '.';
       const dependencyType = getProjectNewDependenciesType(workspaceProject);
       return () => chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         removePackages(['@otter/styling']),
         updateSassImports('o3r'),
         updateThemeFiles(__dirname, options),

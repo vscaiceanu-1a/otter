@@ -1,5 +1,6 @@
 import { chain } from '@angular-devkit/schematics';
 import type { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { updateCmsAdapter } from '../cms-adapter';
 import { NgAddSchematicsSchema } from './schema';
@@ -11,13 +12,15 @@ import { NgAddSchematicsSchema } from './schema';
 export function ngAdd(options: NgAddSchematicsSchema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     try {
-      const { getProjectNewDependenciesType, ngAddPackages, getO3rPeerDeps, getWorkspaceConfig } = await import('@o3r/schematics');
+      const { addDependenciesInPackageJson, getProjectNewDependenciesType, ngAddPackages, getO3rPeerDeps, getWorkspaceConfig } = await import('@o3r/schematics');
       const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
+      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, { encoding: 'utf-8' }));
       const depsInfo = getO3rPeerDeps(packageJsonPath);
       const workspaceProject = options.projectName ? getWorkspaceConfig(tree)?.projects[options.projectName] : undefined;
       const workingDirectory = workspaceProject?.root || '.';
       const dependencyType = getProjectNewDependenciesType(workspaceProject);
       return chain([
+        addDependenciesInPackageJson([packageJson.name!], {...options, workingDirectory, version: packageJson.version}),
         (t, c) => ngAddPackages(depsInfo.o3rPeerDeps, {
           skipConfirmation: true,
           version: depsInfo.packageVersion,
