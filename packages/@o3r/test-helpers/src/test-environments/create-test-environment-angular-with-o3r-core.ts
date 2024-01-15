@@ -45,6 +45,7 @@ export interface CreateTestEnvironmentAngularWithO3rCoreOptions extends CreateTe
  * Generate a base angular app with minimal necessary dependencies and @o3r/core installed with basic preset
  * Uses a locker mechanism so this function can be called in parallel
  * The lock will automatically expire after 10 minutes if the creation of the app failed for whatever reason
+ * @deprecated Use {@link createTestEnvironmentOtterProjectWithApp} instead
  * @param inputOptions
  */
 export async function createTestEnvironmentAngularWithO3rCore(inputOptions: Partial<CreateTestEnvironmentAngularWithO3rCoreOptions>) {
@@ -80,12 +81,12 @@ export async function createTestEnvironmentAngularWithO3rCore(inputOptions: Part
     }
     const o3rVersion = '999.0.0';
     if (options.generateMonorepo) {
-      packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion} --skip-git`, execAppOptions);
+      packageManagerExec({script: 'ng', args: ['add', `@o3r/core@${o3rVersion}`, '--skip-git', '--skip-confirmation']}, execAppOptions);
       // FIXME: workaround for yarn pnp (same issue with node_modules but the runner won't complain if package is present in root instead of project)
       packageManagerAdd(`@o3r/core@${o3rVersion}`, {...execAppOptions, cwd: path.join(appFolderPath, 'projects', 'test-app')});
-      packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion} --project-name=test-app --skip-git`, execAppOptions);
+      packageManagerExec({script: 'ng', args: ['add', `@o3r/core@${o3rVersion}`, '--project-name', 'test-app', '--skip-git', '--skip-confirmation']}, execAppOptions);
     } else {
-      packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion} --skip-git`, execAppOptions);
+      packageManagerExec({script: 'ng', args: ['add', `@o3r/core@${o3rVersion}`, '--skip-git', '--skip-confirmation']}, execAppOptions);
     }
 
     packageManagerInstall(execAppOptions);

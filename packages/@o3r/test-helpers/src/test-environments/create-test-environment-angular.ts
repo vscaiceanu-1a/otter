@@ -97,8 +97,8 @@ export async function createTestEnvironmentAngular(inputOptions: Partial<CreateT
       await fixAngularVersion(appFolderPath);
       setPackagerManagerConfig(options, execAppOptions);
       packageManagerInstall(execAppOptions);
-      packageManagerExec('ng g application dont-modify-me --style=scss --routing --skip-install', execAppOptions);
-      packageManagerExec(`ng g application ${options.appName} --style=scss --routing --skip-install`, execAppOptions);
+      packageManagerExec({ script: 'ng', args: ['g', 'application', 'dont-modify-me', '--style', 'scss', '--routing', '--skip-install']}, execAppOptions);
+      packageManagerExec({script: 'ng', args: ['g', 'application', options.appName, '--style', 'scss', '--routing', '--skip-install']}, execAppOptions);
     } else {
       const createOptions = `--directory=${options.appDirectory} --style=scss --routing --skip-git --skip-install --package-manager=${getPackageManager()}`;
       execFileSync('npm', `create @angular${options.angularVersion ? `@${options.angularVersion}` : ''} ${options.appName} -- ${createOptions}`.split(' '),
@@ -108,9 +108,9 @@ export async function createTestEnvironmentAngular(inputOptions: Partial<CreateT
       setPackagerManagerConfig(options, execAppOptions);
       packageManagerInstall(execAppOptions);
     }
-    packageManagerExec('ng config cli.cache.environment all', execAppOptions);
+    packageManagerExec({ script: 'ng', args: ['config', 'cli.cache.environment', 'all']}, execAppOptions);
     if (options.globalFolderPath) {
-      packageManagerExec(`ng config cli.cache.path "${path.join(options.globalFolderPath, '.angular', 'cache')}"`, execAppOptions);
+      packageManagerExec({script: 'ng', args: ['config', 'cli.cache.path', path.join(options.globalFolderPath, '.angular', 'cache')]}, execAppOptions);
     }
 
     // Add dependencies
@@ -133,8 +133,8 @@ export async function createTestEnvironmentAngular(inputOptions: Partial<CreateT
 
     // Run ng-adds
     const project = options.generateMonorepo ? '--project=test-app' : '';
-    packageManagerExec(`ng add @angular/pwa ${project}`, execAppOptions);
-    packageManagerExec(`ng add @angular/material ${project}`, execAppOptions);
+    packageManagerExec({script: 'ng', args: ['add', '@angular/pwa', project]}, execAppOptions);
+    packageManagerExec({script: 'ng', args: ['add', '@angular/material', project]}, execAppOptions);
 
     if (options.generateMonorepo) {
       // TODO remove this when https://github.com/AmadeusITGroup/otter/issues/603 has been resolved
