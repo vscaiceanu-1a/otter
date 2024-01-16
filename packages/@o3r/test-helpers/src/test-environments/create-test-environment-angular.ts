@@ -5,6 +5,7 @@ import {
   createWithLock,
   CreateWithLockOptions,
   getPackageManager,
+  isYarn1,
   packageManagerAdd,
   PackageManagerConfig,
   packageManagerExec,
@@ -149,7 +150,7 @@ export async function createTestEnvironmentAngular(inputOptions: Partial<CreateT
       // TODO remove this if we manage to make 'workspace <> ng add' work with private registry
       cpSync(path.join(appFolderPath, '.npmrc'), path.join(appFolderPath, 'projects', 'test-app', '.npmrc'));
 
-      if (getPackageManager() === 'yarn' && options.yarnVersion && Number.parseInt(options.yarnVersion.split('.')[0], 10) < 4) {
+      if (getPackageManager() === 'yarn' && options.yarnVersion && !isYarn1() && Number.parseInt(options.yarnVersion.split('.')[0], 10) < 4) {
         execFileSync('yarn', ['plugin', 'import', 'workspace-tools'], {...execAppOptions, shell: process.platform === 'win32'});
       }
     }

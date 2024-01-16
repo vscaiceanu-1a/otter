@@ -116,7 +116,7 @@ describe('new otter application', () => {
     test('should build empty app', () => {
 
       const projectName = '--project-name=test-app';
-      packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion} --preset=all ${projectName}`, execAppOptions);
+      packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion} --preset=all ${projectName}`, { ...execAppOptions, cwd: appFolderPath });
       expect(() => packageManagerInstall(execAppOptions)).not.toThrow();
 
       packageManagerExec(
@@ -203,7 +203,7 @@ describe('new otter application', () => {
         execAppOptions
       );
 
-      expect(() => packageManagerRun('build', execAppOptions)).not.toThrow();
+      expect(() => packageManagerRun('build', { ...execAppOptions, cwd: appFolderPath })).not.toThrow();
 
       // should pass the e2e tests
       packageManagerExec(`ng g @o3r/testing:playwright-scenario --name=test-scenario ${projectName}`, execAppOptions);

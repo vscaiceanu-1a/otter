@@ -42,6 +42,15 @@ export function getPackageManager() {
     'yarn';
 }
 
+export const YARN_1_LATEST_VERSION = '1.22.19';
+
+/**
+ *
+ */
+export function isYarn1() {
+  return process.env.ENFORCED_PACKAGE_MANAGER === 'yarn1';
+}
+
 /**
  * Need to add additional dashes when running command like exec on npm
  * Convert `npm exec test --param` to `npm exec test -- --param`

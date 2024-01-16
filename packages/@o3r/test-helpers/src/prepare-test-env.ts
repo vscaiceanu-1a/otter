@@ -6,7 +6,7 @@ import { minVersion } from 'semver';
 import { createTestEnvironmentAngular } from './test-environments/create-test-environment-angular';
 import { createTestEnvironmentAngularWithO3rCore } from './test-environments/create-test-environment-angular-with-o3r-core';
 import { createTestEnvironmentBlank } from './test-environments/create-test-environment-blank';
-import {createWithLock, packageManagerInstall, setPackagerManagerConfig} from './utilities';
+import {createWithLock, isYarn1, packageManagerInstall, setPackagerManagerConfig, YARN_1_LATEST_VERSION} from './utilities';
 
 /**
  * 'blank' only create yarn/npm config
@@ -19,8 +19,7 @@ export type PrepareTestEnvType = 'blank' | 'angular' | 'angular-with-o3r-core' |
 
 /**
  * Retrieve the version used by yarn and setup at root level
- * @param rootFolderPath: path to the folder where to take the configuration from
- * @param rootFolderPath
+ * @param rootFolderPath path to the folder where to take the configuration from
  */
 export function getYarnVersionFromRoot(rootFolderPath: string) {
   const o3rPackageJson: PackageJson & { generatorDependencies?: Record<string, string> } =
@@ -44,7 +43,7 @@ export async function prepareTestEnv(folderName: string, type: PrepareTestEnvTyp
 
   const o3rCorePackageJson: PackageJson & { generatorDependencies?: Record<string, string> } =
     JSON.parse(readFileSync(path.join(rootFolderPath, 'packages', '@o3r', 'core', 'package.json')).toString());
-  const yarnVersion: string = yarnVersionParam || getYarnVersionFromRoot(rootFolderPath);
+  const yarnVersion: string = yarnVersionParam || (isYarn1() && YARN_1_LATEST_VERSION) || getYarnVersionFromRoot(rootFolderPath);
   const angularVersion = minVersion(o3rCorePackageJson.devDependencies?.['@angular-devkit/schematics'] || 'latest')?.version;
   const materialVersion = minVersion(o3rCorePackageJson.generatorDependencies?.['@angular/material'] || angularVersion || 'latest')?.version;
   const generateMonorepo = type === 'angular-monorepo' || type === 'angular-monorepo-with-o3r-core';

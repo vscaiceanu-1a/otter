@@ -55,7 +55,7 @@ describe('new otter application with analytics', () => {
       addImportToAppModule(appFolderPath, 'TestComponentModule', 'src/components/test-component');
 
       expect(() => packageManagerInstall(execAppOptions)).not.toThrow();
-      expect(() => packageManagerRun('build', execAppOptions)).not.toThrow();
+      expect(() => packageManagerRun('build', { ...execAppOptions, cwd: appFolderPath })).not.toThrow();
     });
   });
 });

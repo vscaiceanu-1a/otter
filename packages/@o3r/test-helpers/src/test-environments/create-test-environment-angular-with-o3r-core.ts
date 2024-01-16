@@ -1,8 +1,8 @@
-import { ExecSyncOptions } from 'node:child_process';
+import { execSync, ExecSyncOptions } from 'node:child_process';
 import { cpSync, existsSync } from 'node:fs';
 import path from 'node:path';
+import { createWithLock, isYarn1, packageManagerAdd, packageManagerExec, packageManagerInstall } from '../utilities';
 import { createTestEnvironmentAngular, CreateTestEnvironmentAngularOptions } from './create-test-environment-angular';
-import { createWithLock, packageManagerAdd, packageManagerExec, packageManagerInstall } from '../utilities';
 
 export interface CreateTestEnvironmentAngularWithO3rCoreOptions extends CreateTestEnvironmentAngularOptions {
   /**
@@ -80,6 +80,10 @@ export async function createTestEnvironmentAngularWithO3rCore(inputOptions: Part
     }
     const o3rVersion = '999.0.0';
     if (options.generateMonorepo) {
+      if (isYarn1()) {
+        // eslint-disable-next-line no-useless-escape
+        execSync('[ -f ./.yarnrc ] && grep -q "^\s*--add.ignore-workspace-root-check true\s*$" ./.yarnrc || echo "--add.ignore-workspace-root-check true" >> ./.yarnrc', execAppOptions);
+      }
       packageManagerExec(`ng add --skip-confirmation @o3r/core@${o3rVersion}`, execAppOptions);
       // FIXME: workaround for yarn pnp (same issue with node_modules but the runner won't complain if package is present in root instead of project)
       packageManagerAdd(`@o3r/core@${o3rVersion}`, {...execAppOptions, cwd: path.join(appFolderPath, 'projects', 'test-app')});
