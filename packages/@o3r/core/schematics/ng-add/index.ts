@@ -2,17 +2,17 @@ import { chain, externalSchematic, noop } from '@angular-devkit/schematics';
 import type { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { askConfirmation } from '@angular/cli/src/utilities/prompt';
 import {
-  AddDevInstall,
   createSchematicWithMetricsIfInstalled,
   displayModuleListRule,
   getWorkspaceConfig,
   isPackageInstalled,
+  ngAddPackages,
   registerPackageCollectionSchematics,
   setupSchematicsDefaultParams
 } from '@o3r/schematics';
+import { NodeDependencyType } from '@schematics/angular/utility/dependencies';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { lastValueFrom } from 'rxjs';
 import type { PackageJson } from 'type-fest';
 import { getExternalPreset, presets } from '../shared/presets';
 import { prepareProject } from './project-setup/index';
@@ -24,7 +24,6 @@ import type { NgAddSchematicsSchema } from './schema';
  */
 function ngAddFn(options: NgAddSchematicsSchema): Rule {
   const corePackageJsonContent = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', '..', 'package.json'), {encoding: 'utf-8'})) as PackageJson;
-  const o3rCoreVersion = corePackageJsonContent.version ? `@${corePackageJsonContent.version}` : '';
   const schematicsDependencies = ['@o3r/schematics'];
 
   return async (tree: Tree, context: SchematicContext): Promise<Rule> => {
@@ -35,18 +34,18 @@ function ngAddFn(options: NgAddSchematicsSchema): Rule {
     }
     const workspaceProject = options.projectName ? getWorkspaceConfig(tree)?.projects[options.projectName] : undefined;
     const workingDirectory = workspaceProject?.root || '.';
-    context.addTask(new AddDevInstall({
-      packageName: [
-        ...schematicsDependencies.map((dependency) => dependency + o3rCoreVersion)
-      ].join(' '),
-      hideOutput: false,
-      quiet: false,
-      workingDirectory,
-      force: options.forceInstall
-    } as any));
-    await lastValueFrom(context.engine.executePostTasks());
 
     return () => chain([
+      ngAddPackages(
+        schematicsDependencies,
+        {
+          dependencyType: NodeDependencyType.Dev,
+          version: corePackageJsonContent.version,
+          workingDirectory,
+          skipConfirmation: true,
+          projectName: options.projectName
+        }
+      ),
       // eslint-disable-next-line @typescript-eslint/naming-convention
       setupSchematicsDefaultParams({ '*:ng-add': { registerDevtool: options.withDevtool } }),
       ...schematicsDependencies.map((dep) => externalSchematic(dep, 'ng-add', options)),
