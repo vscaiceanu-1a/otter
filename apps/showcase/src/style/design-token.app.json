@@ -6,12 +6,25 @@
       "$type": "color",
       "$value": "{color.primary}"
     },
+    "primary-800": {
+      "$type": "color",
+      "$value": "{color.primary.800}"
+    },
     "nav-pills": {
       "$extensions": {
         "o3rScope": ".nav-pills"
       },
       "link-active-color": {
         "$value": "{color.primary}"
+      }
+    },
+    "scrollspy": {
+      "active-color": {
+        "$type": "color",
+        "$value": "{color.primary.800}",
+        "$extensions": {
+          "o3rScope": ".nav.nav-pills .nav-link"
+        }
       }
     }
   }
