@@ -636,7 +636,8 @@ components:
           example: 7
         shipDate:
           type: string
-          format: date-time
+#          TO DO: remove following commented line when we have the configuration to generate string instead of Date or utils.Date (task #1337: https://github.com/AmadeusITGroup/otter/issues/1337)
+#          format: date-time
         status:
           type: string
           description: Order Status

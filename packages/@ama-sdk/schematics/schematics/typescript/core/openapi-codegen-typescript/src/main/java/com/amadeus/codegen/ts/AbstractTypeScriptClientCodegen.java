@@ -2,6 +2,7 @@ package com.amadeus.codegen.ts;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,8 +46,7 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
 
   public AbstractTypeScriptClientCodegen() {
     super();
-    LOGGER.warn("Starting custom generation"
-    );
+    LOGGER.warn("Starting custom generation");
     overwriteFilepathPatterns = new ArrayList<String>();
     skipOverwriteFilepathPatterns = new ArrayList<String>();
     // Holds the list of nonObjectModels (models that does not contain revivers)
@@ -147,6 +147,7 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
     additionalProperties.put("propertyDeclaration", new LambdaHelper.PropertyDeclaration());
     additionalProperties.put("propertyAccess", new LambdaHelper.PropertyAccess());
     additionalProperties.put("headerJsonMimeType", new LambdaHelper.HeaderJsonMimeType());
+    additionalProperties.put("keepRevivers", true);
   }
 
   private static class CamelizeLambda extends LambdaHelper.CustomLambda {
@@ -716,6 +717,26 @@ public abstract class AbstractTypeScriptClientCodegen extends DefaultCodegen imp
     for (Map.Entry<String, ModelsMap> entry : objs.entrySet()) {
       entry.setValue(this.postProcessImports(entry.getValue()));
     }
+    Predicate<CodegenProperty> varRequiredReviverPredicate = var -> !(var.isPrimitiveType || var.complexType != null || var.isEnum || var.isEnumRef);
+    Predicate<ModelMap> isNotEnumPredicate = modelMap -> !modelMap.getModel().isEnum;
+    Predicate<ModelMap> requiredDictionaryPredicate = modelMap -> Boolean.TRUE.equals(modelMap.getModel().vendorExtensions.get("requireDictionary"));
+    Predicate<ModelMap> anyVarRequiredReviverPredicate = modelMap -> modelMap.getModel().allVars.stream().anyMatch(varRequiredReviverPredicate);
+    boolean reviversRequired = objs.values().stream().anyMatch(
+      modelsMap -> modelsMap.getModels().stream().anyMatch(
+        isNotEnumPredicate.and(requiredDictionaryPredicate.or(anyVarRequiredReviverPredicate))
+      )
+    );
+    // Setting keepRevivers value in each model since the additionalProperties are set up before the post process
+    objs.values().stream().forEach(modelsMap -> modelsMap.put("keepRevivers", reviversRequired));
+    // Update global value of keepRevivers for the generation of api files as it happens after the generation of the models
+    additionalProperties.put("keepRevivers", reviversRequired);
+
+    if (!reviversRequired) {
+      modelTemplateFiles.remove("model/reviver.mustache");
+      Predicate<SupportingFile> isReviversTemplatePredicate = supportingFile -> "model/revivers.mustache".equals(supportingFile.getTemplateFile());
+      supportingFiles.removeIf(isReviversTemplatePredicate);
+    }
+
     return objs;
   }
 
