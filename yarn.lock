@@ -5030,12 +5030,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@formatjs/ecma402-abstract@npm:2.3.1":
+  version: 2.3.1
+  resolution: "@formatjs/ecma402-abstract@npm:2.3.1"
+  dependencies:
+    "@formatjs/fast-memoize": "npm:2.2.5"
+    "@formatjs/intl-localematcher": "npm:0.5.9"
+    decimal.js: "npm:10"
+    tslib: "npm:2"
+  checksum: 10/b88814e060a6875994719d9795f79332017ddb8ee6a619e8e5292350ca1b7e98a7634fe7c427b0698228309a62d03381f1c4e4c5b1f00862353d5ace609ed0de
+  languageName: node
+  linkType: hard
+
 "@formatjs/fast-memoize@npm:2.2.4":
   version: 2.2.4
   resolution: "@formatjs/fast-memoize@npm:2.2.4"
   dependencies:
     tslib: "npm:2"
   checksum: 10/1a859b50b9e01bfcb24a643396592ba6fb489ff1cc55f61e4ad33c730d6fb4b393c0eded1c398ba0b85a4f72c6229061946f6a86621f34722e176dc27f9b9e19
+  languageName: node
+  linkType: hard
+
+"@formatjs/fast-memoize@npm:2.2.5":
+  version: 2.2.5
+  resolution: "@formatjs/fast-memoize@npm:2.2.5"
+  dependencies:
+    tslib: "npm:2"
+  checksum: 10/1009b9f782c7b8c0530cde86a68d174bc8055bbf3207eb662429016c2f793bef534e950a13d012861826860ec97d0240fd89eda619267a8191270f581c025f1b
   languageName: node
   linkType: hard
 
@@ -5069,14 +5090,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl-numberformat@npm:~8.14.0":
-  version: 8.14.6
-  resolution: "@formatjs/intl-numberformat@npm:8.14.6"
+"@formatjs/intl-localematcher@npm:0.5.9":
+  version: 0.5.9
+  resolution: "@formatjs/intl-localematcher@npm:0.5.9"
   dependencies:
-    "@formatjs/ecma402-abstract": "npm:2.2.5"
-    "@formatjs/intl-localematcher": "npm:0.5.8"
     tslib: "npm:2"
-  checksum: 10/21edd3601464aed67cf7072b6ea796afd5e06282a2abe5df63189db83c6c7692f8b46caba8b5eb1bf961eb4560c08400c7404f98352c74e8388ebe25ed78633b
+  checksum: 10/79b0009dc997dab90619bc0c1405bc541c288eeac10eb5f1aef8d6526611fca71de789a4b62efe781c0c2ccafba9f0a1da4088af436b84e439681df9cd657d7c
+  languageName: node
+  linkType: hard
+
+"@formatjs/intl-numberformat@npm:~8.15.0":
+  version: 8.15.1
+  resolution: "@formatjs/intl-numberformat@npm:8.15.1"
+  dependencies:
+    "@formatjs/ecma402-abstract": "npm:2.3.1"
+    "@formatjs/intl-localematcher": "npm:0.5.9"
+    decimal.js: "npm:10"
+    tslib: "npm:2"
+  checksum: 10/e484cf4556e7e6439fdbf92c9640f53bf34938605512a43dd73378e372cb181861fe1769a21c173752c60e37496a3177a88273718221ce8441f88913ce89ecb7
   languageName: node
   linkType: hard
 
@@ -10187,7 +10218,7 @@ __metadata:
     "@angular/router": "npm:~18.2.0"
     "@design-factory/design-factory": "npm:~18.1.0"
     "@eslint-community/eslint-plugin-eslint-comments": "npm:^4.4.0"
-    "@formatjs/intl-numberformat": "npm:~8.14.0"
+    "@formatjs/intl-numberformat": "npm:~8.15.0"
     "@ng-bootstrap/ng-bootstrap": "npm:^17.0.0"
     "@ng-select/ng-select": "npm:~13.9.0"
     "@ngrx/effects": "npm:~18.0.0"
@@ -20509,7 +20540,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decimal.js@npm:^10.4.2, decimal.js@npm:^10.4.3":
+"decimal.js@npm:10, decimal.js@npm:^10.4.2, decimal.js@npm:^10.4.3":
   version: 10.4.3
   resolution: "decimal.js@npm:10.4.3"
   checksum: 10/de663a7bc4d368e3877db95fcd5c87b965569b58d16cdc4258c063d231ca7118748738df17cd638f7e9dd0be8e34cec08d7234b20f1f2a756a52fc5a38b188d0
