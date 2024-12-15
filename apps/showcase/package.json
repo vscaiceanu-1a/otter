@@ -30,7 +30,7 @@
     "@ama-sdk/client-fetch": "workspace:^",
     "@ama-sdk/core": "workspace:^",
     "@ama-sdk/schematics": "workspace:^",
-    "@amadeus-it-group/tansu": "~1.0.0",
+    "@amadeus-it-group/tansu": "~2.0.0",
     "@angular/animations": "~18.2.0",
     "@angular/cdk": "~18.2.0",
     "@angular/common": "~18.2.0",

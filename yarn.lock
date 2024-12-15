@@ -996,10 +996,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@amadeus-it-group/tansu@npm:~1.0.0":
-  version: 1.0.0
-  resolution: "@amadeus-it-group/tansu@npm:1.0.0"
-  checksum: 10/d43872e4b4faa814d5c8cd68fe3858af7670334472caa2d0750cc4ef62998f04580e49d95a043f1121c69dcb0d71ba5cc13df80ca651f513f613909cc88c5fda
+"@amadeus-it-group/tansu@npm:~2.0.0":
+  version: 2.0.0
+  resolution: "@amadeus-it-group/tansu@npm:2.0.0"
+  checksum: 10/b6e80f431e72370eb12c9bbb804877cb96891698bc2685ef5ed395199cf6022741552c3ddc07ddc6383102a0d384b93c3c7c295bb72a0f795905fdbb0871646e
   languageName: node
   linkType: hard
 
@@ -7891,7 +7891,7 @@ __metadata:
   dependencies:
     "@agnos-ui/angular-bootstrap": "npm:~0.4.1"
     "@agnos-ui/core-bootstrap": "npm:~0.4.1"
-    "@amadeus-it-group/tansu": "npm:~1.0.0"
+    "@amadeus-it-group/tansu": "npm:~2.0.0"
     "@angular-devkit/build-angular": "npm:~18.2.0"
     "@angular/animations": "npm:~18.2.0"
     "@angular/cli": "npm:~18.2.0"
@@ -9179,7 +9179,7 @@ __metadata:
     "@actions/github": "npm:^6.0.0"
     "@agnos-ui/angular-bootstrap": "npm:~0.4.1"
     "@agnos-ui/core-bootstrap": "npm:~0.4.1"
-    "@amadeus-it-group/tansu": "npm:~1.0.0"
+    "@amadeus-it-group/tansu": "npm:~2.0.0"
     "@angular-devkit/architect": "npm:~0.1802.0"
     "@angular-devkit/build-angular": "npm:~18.2.0"
     "@angular-devkit/core": "npm:~18.2.0"
@@ -10168,7 +10168,7 @@ __metadata:
     "@ama-sdk/core": "workspace:^"
     "@ama-sdk/schematics": "workspace:^"
     "@amadeus-it-group/kassette": "npm:^1.7.0"
-    "@amadeus-it-group/tansu": "npm:~1.0.0"
+    "@amadeus-it-group/tansu": "npm:~2.0.0"
     "@angular-devkit/architect": "npm:~0.1802.0"
     "@angular-devkit/build-angular": "npm:~18.2.0"
     "@angular-devkit/core": "npm:~18.2.0"
