@@ -93,7 +93,7 @@
     "@o3r-training/training-tools": "workspace:^",
     "@o3r/eslint-config": "workspace:^",
     "@o3r/eslint-plugin": "workspace:^",
-    "@openapitools/openapi-generator-cli": "~2.17.0",
+    "@openapitools/openapi-generator-cli": "~2.25.0",
     "@schematics/angular": "~19.2.0",
     "@stylistic/eslint-plugin": "~3.1.0",
     "@swc/cli": "~0.6.0",
@@ -124,7 +124,7 @@
     "rimraf": "^6.0.1",
     "ts-jest": "~29.2.5",
     "tsc-watch": "^6.0.4",
-    "typedoc": "~0.27.9",
+    "typedoc": "~0.28.0",
     "typescript": "~5.8.2",
     "typescript-eslint": "~8.26.0"
   },
