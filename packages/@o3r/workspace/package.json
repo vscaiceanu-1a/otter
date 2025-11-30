@@ -69,7 +69,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@angular-devkit/architect": "~0.1902.0",
+    "@angular-devkit/architect": "0.1902.19",
     "@angular-devkit/build-angular": "~19.2.0",
     "@angular-devkit/core": "~19.2.0",
     "@angular-devkit/schematics": "~19.2.0",
