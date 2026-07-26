@@ -34,7 +34,7 @@
     "type-fest": "^4.30.1"
   },
   "devDependencies": {
-    "@angular-devkit/architect": "~0.1902.0",
+    "@angular-devkit/architect": "0.1902.27",
     "@angular-devkit/core": "~19.2.0",
     "@angular-devkit/schematics": "~19.2.0",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
