@@ -6,8 +6,8 @@
   },
   "peerDependencies": {
     "@ama-mfe/messages": "workspace:^",
-    "@amadeus-it-group/microfrontends": "0.0.3",
-    "@amadeus-it-group/microfrontends-angular": "0.0.3",
+    "@amadeus-it-group/microfrontends": "0.0.11",
+    "@amadeus-it-group/microfrontends-angular": "0.0.11",
     "@angular-devkit/core": "~19.2.0",
     "@angular-devkit/schematics": "~19.2.0",
     "@angular/common": "^19.0.0",
@@ -18,8 +18,8 @@
     "rxjs": "^7.8.1"
   },
   "dependencies": {
-    "@amadeus-it-group/microfrontends": "0.0.3",
-    "@amadeus-it-group/microfrontends-angular": "0.0.3",
+    "@amadeus-it-group/microfrontends": "0.0.11",
+    "@amadeus-it-group/microfrontends-angular": "0.0.11",
     "tslib": "^2.6.2"
   },
   "sideEffects": false,
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@ama-mfe/messages": "workspace:^",
-    "@angular-devkit/architect": "~0.1902.0",
+    "@angular-devkit/architect": "0.1902.27",
     "@angular-devkit/build-angular": "~19.2.0",
     "@angular-devkit/core": "~19.2.0",
     "@angular-devkit/schematics": "~19.2.0",
